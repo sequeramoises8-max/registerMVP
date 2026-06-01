@@ -410,6 +410,20 @@ form {
   padding: 0 !important;
 }
 
+.ml-embedded .ml-form-successBody {
+  opacity: 0;
+  transform: translateY(8px) scale(0.985);
+  transform-origin: 50% 42%;
+  transition:
+    opacity 360ms var(--ease-out),
+    transform 360ms var(--ease-out);
+}
+
+.ml-embedded .ml-form-successBody.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 .ml-embedded .ml-form-embedContent {
   margin-bottom: 18px !important;
 }
@@ -654,10 +668,27 @@ form {
   border-radius: 16px;
   backdrop-filter: blur(8px);
   box-shadow: inset 0 0 0 1px oklch(78% 0.02 76 / 0.34);
+  opacity: 0;
+  transform: translateY(6px) scale(0.985);
+  transition:
+    opacity 260ms var(--ease-out),
+    transform 260ms var(--ease-out);
+  pointer-events: none;
 }
 
 .form-loading[hidden] {
   display: none !important;
+}
+
+.form-loading.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.form-loading.is-leaving {
+  opacity: 0;
+  transform: translateY(-5px) scale(0.985);
 }
 
 .form-loading span {
