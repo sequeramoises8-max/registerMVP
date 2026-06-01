@@ -1,4 +1,9 @@
 const galileoQuote = document.querySelector("#galileoQuote");
+const mailerLiteEmbed = document.querySelector(".ml-embedded");
+const mailerLiteForm = document.querySelector(".ml-block-form");
+const mailerLiteLoader = document.querySelector("[data-form-loading]");
+const mailerLiteSubmitButton = document.querySelector(".ml-form-embedSubmit button.primary");
+let submitLoaderTimeout;
 
 const galileoQuotes = [
   "No puedes ense\u00f1ar algo a alguien, solo puedes ayudarle a que lo encuentre en su interior.",
@@ -9,6 +14,42 @@ const galileoQuotes = [
 ];
 
 galileoQuote.textContent = galileoQuotes[Math.floor(Math.random() * galileoQuotes.length)];
+
+function showSubmitLoader() {
+  if (!mailerLiteEmbed || !mailerLiteLoader) return;
+
+  window.clearTimeout(submitLoaderTimeout);
+  mailerLiteEmbed.classList.add("is-submitting");
+  mailerLiteEmbed.setAttribute("aria-busy", "true");
+  mailerLiteLoader.hidden = false;
+
+  if (mailerLiteSubmitButton) {
+    mailerLiteSubmitButton.disabled = true;
+    mailerLiteSubmitButton.setAttribute("aria-disabled", "true");
+  }
+
+  submitLoaderTimeout = window.setTimeout(() => {
+    const successIsVisible = [...document.querySelectorAll(".ml-subscribe-form-41981371 .row-success")].some(
+      (row) => row.style.display !== "none" && window.getComputedStyle(row).display !== "none",
+    );
+
+    if (!successIsVisible) hideSubmitLoader();
+  }, 14000);
+}
+
+function hideSubmitLoader() {
+  if (!mailerLiteEmbed || !mailerLiteLoader) return;
+
+  window.clearTimeout(submitLoaderTimeout);
+  mailerLiteEmbed.classList.remove("is-submitting");
+  mailerLiteEmbed.removeAttribute("aria-busy");
+  mailerLiteLoader.hidden = true;
+
+  if (mailerLiteSubmitButton) {
+    mailerLiteSubmitButton.disabled = false;
+    mailerLiteSubmitButton.removeAttribute("aria-disabled");
+  }
+}
 
 function loadScriptOnce(src) {
   if (document.querySelector(`script[src="${src}"]`)) return;
@@ -23,6 +64,8 @@ window.ml_webform_success_41981371 = function () {
   const formRows = document.querySelectorAll(".ml-subscribe-form-41981371 .row-form");
   const successRows = document.querySelectorAll(".ml-subscribe-form-41981371 .row-success");
 
+  hideSubmitLoader();
+
   formRows.forEach((row) => {
     row.style.display = "none";
   });
@@ -31,6 +74,14 @@ window.ml_webform_success_41981371 = function () {
     row.style.display = "block";
   });
 };
+
+if (mailerLiteForm) {
+  mailerLiteForm.addEventListener("submit", () => {
+    if (!mailerLiteForm.checkValidity()) return;
+
+    window.requestAnimationFrame(showSubmitLoader);
+  });
+}
 
 loadScriptOnce("https://www.google.com/recaptcha/api.js");
 loadScriptOnce("https://groot.mailerlite.com/js/w/webforms.min.js?vb397d78ebaa8a0f631d35384c46d781b");
