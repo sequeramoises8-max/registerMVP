@@ -1,0 +1,7 @@
+.agents/
+.tools/
+.codex-*.png
+skills-lock.json
+pdf-link/
+assets/
+.vercel/
