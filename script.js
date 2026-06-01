@@ -47,13 +47,15 @@ function showSubmitLoader() {
   }, 14000);
 }
 
-function hideSubmitLoader({ enableButton = true } = {}) {
+function hideSubmitLoader({ enableButton = true, keepSubmitState = false } = {}) {
   if (!mailerLiteEmbed || !mailerLiteLoader) return Promise.resolve();
 
   window.clearTimeout(submitLoaderTimeout);
   window.clearTimeout(loaderTransitionTimeout);
-  mailerLiteEmbed.classList.remove("is-submitting");
-  mailerLiteEmbed.removeAttribute("aria-busy");
+  if (!keepSubmitState) {
+    mailerLiteEmbed.classList.remove("is-submitting", "is-completing");
+    mailerLiteEmbed.removeAttribute("aria-busy");
+  }
   mailerLiteLoader.classList.remove("is-visible");
   mailerLiteLoader.classList.add("is-leaving");
 
@@ -66,6 +68,8 @@ function hideSubmitLoader({ enableButton = true } = {}) {
     loaderTransitionTimeout = window.setTimeout(() => {
       mailerLiteLoader.hidden = true;
       mailerLiteLoader.classList.remove("is-leaving");
+      mailerLiteEmbed.classList.remove("is-submitting", "is-completing");
+      mailerLiteEmbed.removeAttribute("aria-busy");
       resolve();
     }, loaderExitMs);
   });
@@ -98,13 +102,16 @@ window.ml_webform_success_41981371 = function () {
   const remainingLoaderMs = Math.max(minimumLoaderMs - elapsed, 0);
 
   window.setTimeout(() => {
-    hideSubmitLoader({ enableButton: false }).then(() => {
-      formRows.forEach((row) => {
-        row.style.display = "none";
-      });
-
-      revealSuccessRows(successRows);
+    formRows.forEach((row) => {
+      row.style.display = "none";
     });
+
+    mailerLiteEmbed?.classList.add("is-completing");
+    revealSuccessRows(successRows);
+
+    window.setTimeout(() => {
+      hideSubmitLoader({ enableButton: false, keepSubmitState: true });
+    }, 180);
   }, remainingLoaderMs);
 };
 

@@ -703,6 +703,11 @@ form {
   pointer-events: none;
 }
 
+.ml-embedded.is-submitting.is-completing .ml-form-embedWrapper {
+  opacity: 1;
+  filter: none;
+}
+
 .pencil {
   display: block;
   width: 7.5em;
